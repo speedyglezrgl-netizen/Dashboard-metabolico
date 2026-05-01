@@ -1,0 +1,123 @@
+html_content = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Metabólico V2 - Dr. Ramon Cito</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --success: #27ae60;
+            --bg: #f4f7f6;
+        }
+        body { font-family: sans-serif; background: var(--bg); padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
+        h1 { text-align: center; color: var(--primary); font-size: 1.3rem; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        input[type="range"] { width: 100%; }
+        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; background: #fff; }
+        .val-display { font-weight: bold; color: var(--accent); float: right; }
+        .risk-meter { height: 25px; background: #eee; border-radius: 12px; margin: 20px 0; overflow: hidden; border: 1px solid #ccc; }
+        #risk-bar { height: 100%; width: 0%; transition: 0.4s ease-in-out; }
+        .result-card { padding: 15px; border-radius: 10px; border-left: 5px solid #ccc; background: #f9f9f9; font-size: 0.95rem; line-height: 1.4; }
+        .alert-red { border-left-color: var(--danger); background: #fdf2f2; color: #721c24; }
+        .alert-orange { border-left-color: var(--warning); background: #fffcf5; color: #856404; }
+        .alert-green { border-left-color: var(--success); background: #f2fdf5; color: #155724; }
+        .meta-box { background: #e8f4fd; padding: 10px; border-radius: 8px; text-align: center; margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Análisis de Grasa Segmental</h1>
+
+    <div class="control-group">
+        <label>Grasa Visceral Actual <span id="v-actual" class="val-display">20</span></label>
+        <input type="range" id="input-v" min="1" max="25" value="20" oninput="update()">
+    </div>
+
+    <div class="control-group">
+        <label>Relación Músculo:Grasa (Tronco)</label>
+        <select id="input-ratio" onchange="update()">
+            <option value="40">1:1 (Observado / Muy Crítico)</option>
+            <option value="25">1:1.5 (Riesgo Alto)</option>
+            <option value="10">1:2.0 (Riesgo Moderado)</option>
+            <option value="0">1:2.5 (Saludable)</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <label>Calidad de Proteína</label>
+        <select id="input-prot" onchange="update()">
+            <option value="ok">Buena / Normal</option>
+            <option value="no">Baja (Riesgo Sarcopénico)</option>
+        </select>
+    </div>
+
+    <div class="risk-meter">
+        <div id="risk-bar"></div>
+    </div>
+
+    <div id="result" class="result-card">
+        Calculando riesgo...
+    </div>
+
+    <div class="meta-box">
+        Meta Visceral: 9 | Brecha: <span id="gap">11</span>
+    </div>
+</div>
+
+<script>
+function update() {
+    const v = parseInt(document.getElementById('input-v').value);
+    const ratioBonus = parseInt(document.getElementById('input-ratio').value);
+    const prot = document.getElementById('input-prot').value;
+
+    document.getElementById('v-actual').innerText = v;
+    document.getElementById('gap').innerText = (v - 9 > 0) ? v - 9 : 0;
+
+    const bar = document.getElementById('risk-bar');
+    const res = document.getElementById('result');
+
+    let score = (v * 2.4) + ratioBonus;
+    if (score > 100) score = 100;
+
+    bar.style.width = score + '%';
+    
+    res.className = "result-card";
+    let msg = "";
+
+    if (score >= 75) {
+        bar.style.backgroundColor = '#e74c3c';
+        res.classList.add("alert-red");
+        msg = "<strong>ESTADO CRÍTICO:</strong> La grasa visceral y el ratio 1:1 indican que sus órganos están 'ahogados'. Riesgo inminente de hígado graso grado 3.";
+    } else if (score >= 45) {
+        bar.style.backgroundColor = '#f39c12';
+        res.classList.add("alert-orange");
+        msg = "<strong>RIESGO MODERADO:</strong> Aunque ha mejorado el ratio, la grasa visceral sigue alta. El metabolismo está bajo presión.";
+    } else {
+        bar.style.backgroundColor = '#27ae60';
+        res.classList.add("alert-green");
+        msg = "<strong>ESTADO SALUDABLE:</strong> El entorno de sus órganos es seguro. Siga protegiendo su masa magra.";
+    }
+
+    if (prot === "ok") {
+        msg += "<br><br><small>✓ Su estructura muscular está intacta. El problema es puramente acumulación visceral.</small>";
+    } else {
+        msg += "<br><br><small>⚠️ Alerta: Pérdida de músculo detectada. El metabolismo se está volviendo lento.</small>";
+    }
+
+    res.innerHTML = msg;
+}
+update();
+</script>
+
+</body>
+</html>"""
+
+with open("Simulador_Metabolico_RamonCito.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
