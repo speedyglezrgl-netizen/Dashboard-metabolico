@@ -1,0 +1,9 @@
+{
+  "name": "Panel Metabólico V2",
+  "short_name": "Metabólico",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#2c3e50",
+  "icons": []
+}
